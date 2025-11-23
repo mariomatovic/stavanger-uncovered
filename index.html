@@ -14,39 +14,55 @@
     
     <div id="title-card">
         <h1>Stavanger Uncovered</h1>
-        <p>The living economic map of the Stavanger area.</p>
-    </div>
-    
-    <div id="controls">
-        <button id="densityBtn" class="active">Density View</button>
-        <button id="ecosystemBtn">Ecosystem View</button>
+        <p>Discover active businesses in the Stavanger region.</p>
     </div>
 
     <div id="filters">
-        <h3>Filters</h3>
+        <h3>🔍 Search & Filter</h3>
         
         <div class="filter-group">
-            <label>Company Age</label>
-            <select id="ageFilter">
-                <option value="all">All Companies</option>
-                <option value="new">New (0-6 months)</option>
-                <option value="growth">Growth Phase (6-18 months)</option>
-                <option value="established">Established (18+ months)</option>
+            <label>Search Company</label>
+            <input type="text" id="searchInput" placeholder="Search by name, address, or industry...">
+        </div>
+
+        <div class="filter-group">
+            <label>Industry</label>
+            <select id="industryFilter">
+                <option value="all">All Industries</option>
+                <!-- Dynamically populated -->
             </select>
         </div>
 
         <div class="filter-group">
-            <label>Industry Type</label>
-            <select id="industryFilter">
-                <option value="all">All Industries</option>
-                <option value="exclude-annet">Exclude "Annet" (Other)</option>
-                <option value="only-annet">Only "Annet" (Other)</option>
+            <label>Company Age</label>
+            <select id="ageFilter">
+                <option value="all">All Ages</option>
+                <option value="new">New (0-6 months)</option>
+                <option value="growth">Growth Phase (6-18 months)</option>
+                <option value="young">Young (18 months - 3 years)</option>
+                <option value="established">Established (3+ years)</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Company Type</label>
+            <select id="companyTypeFilter">
+                <option value="all">All Types</option>
+                <!-- Dynamically populated -->
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Area (Municipality)</label>
+            <select id="areaFilter">
+                <option value="all">All Areas</option>
+                <!-- Dynamically populated -->
             </select>
         </div>
 
         <div class="checkbox-group">
             <input type="checkbox" id="clusterToggle" checked>
-            <label for="clusterToggle">Enable clustering (reduces crowding)</label>
+            <label for="clusterToggle">Cluster markers</label>
         </div>
 
         <div id="status">Loading businesses...</div>
