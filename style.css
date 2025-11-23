@@ -1,63 +1,176 @@
-body, html {
+* {
     margin: 0;
     padding: 0;
-    height: 100%;
-    width: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     overflow: hidden;
 }
 
 #map {
-    height: 100%;
-    width: 100%;
-    background-color: #f4f4f4;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
 }
 
 #title-card {
     position: absolute;
-    top: 10px;
-    left: 50px;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 5px 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    max-width: 350px;
 }
 
 #title-card h1 {
-    margin: 5px 0;
-    font-size: 1.5em;
-    color: #333;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1a1a1a;
 }
 
 #title-card p {
-    margin: 5px 0;
+    font-size: 14px;
     color: #666;
+    line-height: 1.5;
 }
 
 #controls {
     position: absolute;
     top: 20px;
     right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 200px;
 }
 
 #controls button {
-    background-color: transparent;
-    border: none;
-    padding: 10px 15px;
+    padding: 10px 16px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
     color: #333;
-    transition: background-color 0.3s;
+}
+
+#controls button:hover {
+    background: #f5f5f5;
+    border-color: #007bff;
 }
 
 #controls button.active {
-    background-color: #007bff;
+    background: #007bff;
     color: white;
-    border-radius: 8px;
+    border-color: #007bff;
+}
+
+#filters {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 320px;
+}
+
+#filters h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    background: white;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    font-size: 13px;
+    cursor: pointer;
+    margin: 0;
+}
+
+#status {
+    font-size: 12px;
+    color: #666;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.leaflet-popup-content {
+    margin: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.leaflet-popup-content b {
+    color: #1a1a1a;
+}
+
+.leaflet-popup-content hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 8px 0;
+}
+
+@media (max-width: 768px) {
+    #title-card, #controls, #filters {
+        max-width: calc(100% - 40px);
+    }
 }
