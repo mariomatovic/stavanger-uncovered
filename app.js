@@ -8,18 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
         maxZoom: 20
     }).addTo(map);
 
-    // 2. Define Industry Colors (The Ecosystem View)
-    const industryColors = {
-        'Energi': '#28a745',
-        'Teknologi': '#007bff',
-        'Bygg og Anlegg': '#fd7e14',
-        'Handel og Service': '#6f42c1',
-        'Helse og Sosial': '#dc3545',
-        'Utdanning og Forskning': '#ffc107',
-        'Annet': '#6c757d'
-    };
-
-    const defaultColor = '#007bff';
+    // 2. Color palette for different industries
+    const industryColorPalette = [
+        '#007bff', '#28a745', '#dc3545', '#ffc107', '#6f42c1', 
+        '#fd7e14', '#20c997', '#e83e8c', '#17a2b8', '#6c757d'
+    ];
+    
+    let industryColors = {};
     let businessLayer = L.layerGroup().addTo(map);
     let markerClusterGroup = L.markerClusterGroup({
         maxClusterRadius: 50,
@@ -29,10 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     let businesses = [];
-    let currentView = 'density';
     let useclustering = true;
+    let searchTimeout = null;
 
-    // 4. Calculate company age in months
+    // 3. Calculate company age in months
     function getCompanyAgeMonths(foundedDate) {
         const founded = new Date(foundedDate);
         const now = new Date();
@@ -41,38 +36,115 @@ document.addEventListener('DOMContentLoaded', () => {
         return months;
     }
 
-    // 5. Filter functions
+    // 4. Filter functions
     function passesFilters(biz) {
+        // Only show active companies
+        if (biz.status && biz.status !== 'Active') return false;
+
+        // Search filter
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (searchTerm) {
+            const searchableText = [
+                biz.name || '',
+                biz.address || '',
+                biz.industry || '',
+                biz.company_type || ''
+            ].join(' ').toLowerCase();
+            
+            if (!searchableText.includes(searchTerm)) return false;
+        }
+
         // Age filter
         const ageFilter = document.getElementById('ageFilter').value;
         const ageMonths = getCompanyAgeMonths(biz.founded);
         
         if (ageFilter === 'new' && ageMonths > 6) return false;
         if (ageFilter === 'growth' && (ageMonths < 6 || ageMonths > 18)) return false;
-        if (ageFilter === 'established' && ageMonths < 18) return false;
+        if (ageFilter === 'young' && (ageMonths < 18 || ageMonths > 36)) return false;
+        if (ageFilter === 'established' && ageMonths < 36) return false;
 
         // Industry filter
         const industryFilter = document.getElementById('industryFilter').value;
-        
-        if (industryFilter === 'exclude-annet' && biz.industry === 'Annet') return false;
-        if (industryFilter === 'only-annet' && biz.industry !== 'Annet') return false;
+        if (industryFilter !== 'all' && biz.industry !== industryFilter) return false;
+
+        // Company type filter
+        const companyTypeFilter = document.getElementById('companyTypeFilter').value;
+        if (companyTypeFilter !== 'all' && biz.company_type !== companyTypeFilter) return false;
+
+        // Area filter
+        const areaFilter = document.getElementById('areaFilter').value;
+        if (areaFilter !== 'all' && biz.municipality !== areaFilter) return false;
 
         return true;
     }
 
-    // 6. Update status display
+    // 5. Update status display
     function updateStatus() {
         const total = businesses.length;
-        const withCoords = businesses.filter(b => b.latitude && b.longitude).length;
-        const filtered = businesses.filter(passesFilters).length;
+        const active = businesses.filter(b => b.status === 'Active').length;
+        const withCoords = businesses.filter(b => b.latitude && b.longitude && b.status === 'Active').length;
+        const filtered = businesses.filter(b => b.latitude && b.longitude && passesFilters(b)).length;
         
         document.getElementById('status').innerHTML = `
-            Total: ${total} | With location: ${withCoords} | Filtered: ${filtered}
+            <b>Total:</b> ${total.toLocaleString()}<br>
+            <b>Active:</b> ${active.toLocaleString()}<br>
+            <b>On map:</b> ${withCoords.toLocaleString()}<br>
+            <b>Filtered:</b> ${filtered.toLocaleString()}
         `;
     }
 
+    // 6. Populate dynamic filters
+    function populateFilters() {
+        // Get unique industries (excluding null/empty)
+        const industries = [...new Set(businesses
+            .filter(b => b.industry && b.industry !== 'Annet')
+            .map(b => b.industry))]
+            .sort();
+        
+        const industrySelect = document.getElementById('industryFilter');
+        industries.forEach(industry => {
+            const option = document.createElement('option');
+            option.value = industry;
+            option.textContent = industry;
+            industrySelect.appendChild(option);
+        });
+
+        // Assign colors to industries
+        industries.forEach((industry, idx) => {
+            industryColors[industry] = industryColorPalette[idx % industryColorPalette.length];
+        });
+
+        // Get unique company types
+        const companyTypes = [...new Set(businesses
+            .filter(b => b.company_type)
+            .map(b => b.company_type))]
+            .sort();
+        
+        const companyTypeSelect = document.getElementById('companyTypeFilter');
+        companyTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            companyTypeSelect.appendChild(option);
+        });
+
+        // Get unique municipalities
+        const municipalities = [...new Set(businesses
+            .filter(b => b.municipality)
+            .map(b => b.municipality))]
+            .sort();
+        
+        const areaSelect = document.getElementById('areaFilter');
+        municipalities.forEach(municipality => {
+            const option = document.createElement('option');
+            option.value = municipality;
+            option.textContent = municipality;
+            areaSelect.appendChild(option);
+        });
+    }
+
     // 7. Fetch and Process Data
-    fetch('data.json')
+    fetch('data_enriched.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -83,52 +155,64 @@ document.addEventListener('DOMContentLoaded', () => {
             businesses = data;
             console.log(`Loaded ${businesses.length} businesses.`);
             
+            // Populate dynamic filters
+            populateFilters();
+            
             // Initial draw
-            drawBusinesses('density');
+            drawBusinesses();
             updateStatus();
 
             // 8. Handle Controls
-            const densityBtn = document.getElementById('densityBtn');
-            const ecosystemBtn = document.getElementById('ecosystemBtn');
+            const searchInput = document.getElementById('searchInput');
             const ageFilter = document.getElementById('ageFilter');
             const industryFilter = document.getElementById('industryFilter');
+            const companyTypeFilter = document.getElementById('companyTypeFilter');
+            const areaFilter = document.getElementById('areaFilter');
             const clusterToggle = document.getElementById('clusterToggle');
 
-            densityBtn.addEventListener('click', () => {
-                currentView = 'density';
-                drawBusinesses('density');
-                densityBtn.classList.add('active');
-                ecosystemBtn.classList.remove('active');
-            });
-
-            ecosystemBtn.addEventListener('click', () => {
-                currentView = 'ecosystem';
-                drawBusinesses('ecosystem');
-                ecosystemBtn.classList.add('active');
-                densityBtn.classList.remove('active');
+            // Search with debounce (wait 500ms after typing stops)
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    drawBusinesses();
+                    updateStatus();
+                }, 500);
             });
 
             ageFilter.addEventListener('change', () => {
-                drawBusinesses(currentView);
+                drawBusinesses();
                 updateStatus();
             });
 
             industryFilter.addEventListener('change', () => {
-                drawBusinesses(currentView);
+                drawBusinesses();
+                updateStatus();
+            });
+
+            companyTypeFilter.addEventListener('change', () => {
+                drawBusinesses();
+                updateStatus();
+            });
+
+            areaFilter.addEventListener('change', () => {
+                drawBusinesses();
                 updateStatus();
             });
 
             clusterToggle.addEventListener('change', (e) => {
                 useclustering = e.target.checked;
-                drawBusinesses(currentView);
+                drawBusinesses();
             });
         })
         .catch(error => {
             console.error('Error loading business data:', error);
-            document.getElementById('title-card').innerHTML = `<h1>Error Loading Data</h1><p>Could not load business data. Please ensure 'data.json' is present and correctly formatted.</p>`;
+            document.getElementById('title-card').innerHTML = `
+                <h1>Error Loading Data</h1>
+                <p>Could not load business data. Please ensure 'data_enriched.json' is present.</p>
+            `;
         });
 
-    function drawBusinesses(view) {
+    function drawBusinesses() {
         // Clear existing layers
         businessLayer.clearLayers();
         markerClusterGroup.clearLayers();
@@ -139,9 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
         businesses.forEach(biz => {
             // Only draw if we have valid coordinates and passes filters
             if (biz.latitude && biz.longitude && passesFilters(biz)) {
-                const color = view === 'ecosystem' ? 
-                    (industryColors[biz.industry] || industryColors['Annet']) : 
-                    defaultColor;
+                // Get color based on industry
+                const color = industryColors[biz.industry] || '#6c757d';
                 
                 const circle = L.circleMarker([biz.latitude, biz.longitude], {
                     radius: 5,
@@ -155,17 +238,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Create the popup content
                 const ageMonths = getCompanyAgeMonths(biz.founded);
                 const ageText = ageMonths < 12 ? 
-                    `${ageMonths} months old` : 
-                    `${Math.floor(ageMonths / 12)} years old`;
+                    `${ageMonths} months` : 
+                    `${Math.floor(ageMonths / 12)} years`;
 
                 const popupContent = `
-                    <b>${biz.name}</b><br>
-                    <hr style="margin: 4px 0;">
-                    <b>Industry:</b> ${biz.industry}<br>
-                    <b>Size:</b> ${biz.employees}<br>
-                    <b>Founded:</b> ${biz.founded} (${ageText})<br>
-                    <b>Address:</b> ${biz.address}<br>
-                    <small>Org. Nr: ${biz.org_number}</small>
+                    <div>
+                        <b style="font-size: 14px;">${biz.name}</b><br>
+                        <span class="company-badge">${biz.company_type || 'Unknown Type'}</span>
+                        <hr style="margin: 8px 0;">
+                        <b>Industry:</b> ${biz.industry || 'Not specified'}<br>
+                        <b>Employees:</b> ${biz.employees || 'Unknown'}<br>
+                        <b>Age:</b> ${ageText}<br>
+                        <b>Status:</b> <span class="status-active">${biz.status || 'Unknown'}</span><br>
+                        <b>Area:</b> ${biz.municipality || 'Unknown'}<br>
+                        <b>Address:</b> ${biz.address}<br>
+                        <small style="color: #999;">Org. Nr: ${biz.org_number}</small>
+                    </div>
                 `;
 
                 circle.bindPopup(popupContent);
@@ -189,9 +277,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Update the title card
+        const activeCount = businesses.filter(b => b.status === 'Active').length;
         document.getElementById('title-card').innerHTML = `
             <h1>Stavanger Uncovered</h1>
-            <p>Showing ${drawnCount} businesses in the Stavanger area.</p>
+            <p>Showing <b>${drawnCount.toLocaleString()}</b> active businesses from <b>${activeCount.toLocaleString()}</b> total.</p>
         `;
         
         updateStatus();
