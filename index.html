@@ -5,22 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stavanger Uncovered - The Economic X-Ray</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="map"></div>
-
+    
     <div id="title-card">
         <h1>Stavanger Uncovered</h1>
         <p>The living economic map of the Stavanger area.</p>
     </div>
-
+    
     <div id="controls">
         <button id="densityBtn" class="active">Density View</button>
         <button id="ecosystemBtn">Ecosystem View</button>
     </div>
 
+    <div id="filters">
+        <h3>Filters</h3>
+        
+        <div class="filter-group">
+            <label>Company Age</label>
+            <select id="ageFilter">
+                <option value="all">All Companies</option>
+                <option value="new">New (0-6 months)</option>
+                <option value="growth">Growth Phase (6-18 months)</option>
+                <option value="established">Established (18+ months)</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Industry Type</label>
+            <select id="industryFilter">
+                <option value="all">All Industries</option>
+                <option value="exclude-annet">Exclude "Annet" (Other)</option>
+                <option value="only-annet">Only "Annet" (Other)</option>
+            </select>
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="clusterToggle" checked>
+            <label for="clusterToggle">Enable clustering (reduces crowding)</label>
+        </div>
+
+        <div id="status">Loading businesses...</div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
