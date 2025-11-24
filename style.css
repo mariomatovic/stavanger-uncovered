@@ -255,3 +255,12 @@ body {
     cursor: pointer !important;
 }
 
+.custom-label-icon {
+    pointer-events: auto;
+}
+.marker-label:hover {
+    font-weight: bold;
+}
+
+
+
