@@ -47,7 +47,6 @@ body {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    /* Updated to match title-card color: linear-gradient(135deg, #667eea 0%, #764ba2 100%) */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 20px;
     border-radius: 12px;
@@ -63,6 +62,7 @@ body {
     margin-bottom: 15px;
     color: #ffffff;
     font-weight: 600;
+    user-select: none;
 }
 
 .filter-group {
@@ -81,13 +81,12 @@ body {
 .filter-group input[type="text"] {
     width: 100%;
     padding: 10px 14px;
-    /* Changed to white background for visibility on dark blue background */
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     font-size: 14px;
     cursor: pointer;
-    background: #ffffff; /* Solid white for contrast */
-    color: #333333; /* Dark text for contrast */
+    background: #ffffff;
+    color: #333333;
     transition: border-color 0.2s;
 }
 
@@ -174,7 +173,6 @@ body {
     color: #dc3545;
 }
 
-/* Scrollbar styling for filter panel */
 #filters::-webkit-scrollbar {
     width: 6px;
 }
@@ -193,44 +191,15 @@ body {
     background: #555;
 }
 
-@media (max-width: 768px) {
-    #title-card, #filters {
-        max-width: calc(100% - 40px);
-    }
-    
-    #title-card {
-        right: 10px;
-        top: 10px;
-        padding: 15px 20px;
-    }
-    
-    #filters {
-        left: 10px;
-        bottom: 10px;
-        max-height: 50vh;
-    }
-
-    /* Adjust zoom control position for mobile */
-    .leaflet-top.leaflet-left {
-        top: 10px;
-        right: 10px;
-        left: auto;
-    }
-}
-
-/* Make sure Leaflet zoom controls don't overlap */
 .leaflet-top.leaflet-left {
-    /* Original position was top: 20px; left: 20px; */
-    /* Moving to top right, next to title-card */
     top: 20px;
     right: 20px;
-    left: auto; /* Ensure it's not constrained by left: 20px */
+    left: auto;
 }
 
 .leaflet-control-zoom {
     margin-top: 0 !important;
     margin-left: 0 !important;
-    /* Use the same color scheme as the title/filter card for consistency */
     border: 2px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 8px !important;
     overflow: hidden;
@@ -238,33 +207,33 @@ body {
 
 .leaflet-control-zoom a {
     background-color: rgba(255, 255, 255, 0.95) !important;
-    /* Use the darker end of the gradient for the icon color */
-    color: #764ba2 !important; 
+    color: #764ba2 !important;
     font-weight: 600 !important;
 }
 
 .leaflet-control-zoom a:hover {
-    /* Use the lighter end of the gradient for hover background */
-    background-color: #667eea !important; 
+    background-color: #667eea !important;
     color: white !important;
 }
 
-
-/* Force pointer cursor on the custom marker's large clickable area to override map drag cursor */
 .custom-marker {
     cursor: pointer !important;
 }
 
-/* === Mobile Optimization for Map UI === */
+/* === Mobile Optimization for Map UI & Drawer === */
 @media (max-width: 768px) {
 
     body {
         overflow: hidden;
     }
 
+    #title-card, #filters {
+        max-width: calc(100% - 40px);
+    }
+
     #title-card {
-        top: 8px;
         right: 8px;
+        top: 8px;
         padding: 12px 15px;
         max-width: 240px;
     }
@@ -279,16 +248,15 @@ body {
         line-height: 1.3;
     }
 
-    /* Turn filters into a sliding drawer */
+    /* Sliding drawer styles */
     #filters {
-        bottom: 0;
         left: 0;
         right: 0;
-        max-width: 100%;
+        bottom: 0;
         width: 100%;
         padding: 16px;
         border-radius: 12px 12px 0 0;
-        max-height: 40vh;
+        max-height: 50vh;
         transform: translateY(calc(100% - 50px));
         transition: transform 0.3s ease-in-out;
         overflow-y: auto;
@@ -303,6 +271,8 @@ body {
         margin-bottom: 10px;
         text-align: center;
         padding-bottom: 6px;
+        cursor: pointer;
+        user-select: none;
     }
 
     .filter-group {
@@ -330,12 +300,14 @@ body {
         font-size: 12px;
     }
 
-    /* Zoom controls — perfect placement */
+    /* Zoom controls placement for mobile */
     .leaflet-top.leaflet-left {
         top: 60px;
         right: 8px;
+        left: auto;
     }
 }
+
 
 
 
