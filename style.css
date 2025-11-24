@@ -256,7 +256,7 @@ body {
 }
 
 /* === Mobile Optimization for Map UI === */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
 
     body {
         overflow: hidden;
@@ -336,6 +336,7 @@ body {
         right: 8px;
     }
 }
+
 
 
 
