@@ -47,7 +47,8 @@ body {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    /* Updated to match title-card color: linear-gradient(135deg, #667eea 0%, #764ba2 100%) */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -80,11 +81,13 @@ body {
 .filter-group input[type="text"] {
     width: 100%;
     padding: 10px 14px;
+    /* Changed to white background for visibility on dark blue background */
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     font-size: 14px;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff; /* Solid white for contrast */
+    color: #333333; /* Dark text for contrast */
     transition: border-color 0.2s;
 }
 
@@ -206,29 +209,42 @@ body {
         bottom: 10px;
         max-height: 50vh;
     }
+
+    /* Adjust zoom control position for mobile */
+    .leaflet-top.leaflet-left {
+        top: 10px;
+        right: 10px;
+        left: auto;
+    }
 }
 
 /* Make sure Leaflet zoom controls don't overlap */
 .leaflet-top.leaflet-left {
+    /* Original position was top: 20px; left: 20px; */
+    /* Moving to top right, next to title-card */
     top: 20px;
-    left: 20px;
+    right: 20px;
+    left: auto; /* Ensure it's not constrained by left: 20px */
 }
 
 .leaflet-control-zoom {
     margin-top: 0 !important;
     margin-left: 0 !important;
-    border: 2px solid rgba(102, 126, 234, 0.3) !important;
+    /* Use the same color scheme as the title/filter card for consistency */
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 8px !important;
     overflow: hidden;
 }
 
 .leaflet-control-zoom a {
     background-color: rgba(255, 255, 255, 0.95) !important;
-    color: #667eea !important;
+    /* Use the darker end of the gradient for the icon color */
+    color: #764ba2 !important; 
     font-weight: 600 !important;
 }
 
 .leaflet-control-zoom a:hover {
-    background-color: #667eea !important;
+    /* Use the lighter end of the gradient for hover background */
+    background-color: #667eea !important; 
     color: white !important;
 }
