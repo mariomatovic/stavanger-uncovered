@@ -225,29 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Get color based on industry
                 const color = industryColors[biz.industry] || '#6c757d';
                 
-                // Custom label for business name (clickable)
-const labelText = biz.name; // or: `${biz.name} - ${biz.company_type || ''}`
+                // Label text (you can include company_type if you like)
+const labelText = biz.name;
 
-const customIcon = L.divIcon({
-    className: 'custom-label-icon',
-    html: `
-        <div class="marker-label" style="
-            background: white;
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 2px 4px;
-            font-size: 11px;
-            white-space: nowrap;
-            cursor: pointer;
-            transform: translate(-50%, -18px);
-        ">
-            ${labelText}
-        </div>
-    `,
-    iconSize: [0, 0]
-});
-
-// Base pin (circle marker stays)
+// Create the popup first (unchanged)
 const marker = L.circleMarker([biz.latitude, biz.longitude], {
     radius: 5,
     fillColor: color,
@@ -256,16 +237,29 @@ const marker = L.circleMarker([biz.latitude, biz.longitude], {
     opacity: 0.7,
     fillOpacity: 0.5
 });
-
 marker.bindPopup(popupContent);
 
-// Label marker (click opens same popup)
-const labelMarker = L.marker([biz.latitude, biz.longitude], { icon: customIcon });
+// Create label icon
+const customIcon = L.divIcon({
+    className: 'custom-label-icon',
+    html:
+        '<div class="marker-label">' +
+        labelText +
+        '</div>',
+    iconSize: [0, 0]
+});
+
+// Create label marker that triggers popup
+const labelMarker = L.marker([biz.latitude, biz.longitude], {
+    icon: customIcon,
+    interactive: true
+});
 labelMarker.on('click', () => marker.openPopup());
 
-// Add both to map or cluster
+// Add both markers
 if (useclustering) {
-    markers.push(marker, labelMarker);
+    markers.push(marker);
+    markers.push(labelMarker);
 } else {
     marker.addTo(businessLayer);
     labelMarker.addTo(businessLayer);
@@ -294,5 +288,6 @@ drawnCount++;
         updateStatus(); // This call is now a no-op
     }
 });
+
 
 
