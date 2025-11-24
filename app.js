@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get color based on industry
             const color = industryColors[biz.industry] || '#6c757d';
 
-            // Build popup content (same as before)
+            // Build popup content
             const ageMonths = getCompanyAgeMonths(biz.founded);
             const ageText = ageMonths < 12 ? 
                 `${ageMonths} months` : 
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             // Label text (visible above pin)
-            const labelText = biz.name;
+            const labelText = biz.name || '';
 
             // Marker pin (circle)
             const marker = L.circleMarker([biz.latitude, biz.longitude], {
@@ -259,34 +259,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 opacity: 0.7,
                 fillOpacity: 0.5
             });
+
+            // Bind popup to marker
             marker.bindPopup(popupContent);
 
-            // Label marker (clickable text)
-            const customIcon = L.divIcon({
-                className: 'custom-label-icon',
-                html: '<div class="marker-label">' + labelText + '</div>',
-                iconSize: [0, 0]
-            });
-
-            const labelMarker = L.marker([biz.latitude, biz.longitude], {
-                icon: customIcon,
+            // Bind a permanent tooltip to serve as the label.
+            // Using interactive: true means pointer events pass through to marker; clicking label triggers marker click.
+            marker.bindTooltip(labelText, {
+                permanent: true,
+                direction: 'top',
+                offset: [0, -6],
+                className: 'marker-label-tooltip',
                 interactive: true
             });
 
-            labelMarker.on('click', () => marker.openPopup());
+            // Make marker open popup on click (tooltip clicks will bubble to marker)
+            marker.on('click', () => marker.openPopup());
 
-            // Add depending on clustering setting
+            // Add to cluster array (single layer per business)
             if (useclustering) {
                 markers.push(marker);
-                markers.push(labelMarker);
             } else {
                 marker.addTo(businessLayer);
-                labelMarker.addTo(businessLayer);
             }
 
             drawnCount++;
         }
     });
+
+    // Add markers to cluster if clustering enabled
+    if (useclustering && markers.length > 0) {
+        markerClusterGroup.addLayers(markers);
+        map.addLayer(markerClusterGroup);
+    } else {
+        map.removeLayer(markerClusterGroup);
+    }
+
+    // Update title card
+    const activeCount = businesses.filter(b => b.status === 'Active').length;
+    document.getElementById('title-card').innerHTML = `
+        <h1>Stavanger Uncovered</h1>
+        <p>Showing <b>${drawnCount.toLocaleString()}</b> active businesses from <b>${activeCount.toLocaleString()}</b> total.</p>
+    `;
+
+    // keep the old hook if you want (no-op): updateStatus();
+}
 
     // Add markers to cluster if clustering enabled
     if (useclustering && markers.length > 0) {
@@ -323,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStatus(); // This call is now a no-op
     }
 });
+
 
 
 
