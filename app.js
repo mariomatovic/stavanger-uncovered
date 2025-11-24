@@ -120,6 +120,27 @@ document.addEventListener('DOMContentLoaded', () => {
             companyTypeFilter.addEventListener('change', redraw);
             areaFilter.addEventListener('change', redraw);
             clusterToggle.addEventListener('change', e => { useclustering = e.target.checked; drawBusinesses(); });
+
+            // Mobile filter drawer behavior
+const filters = document.getElementById("filters");
+
+// Toggle drawer on tap — but only when tapping the top bar area
+filters.addEventListener("click", (e) => {
+    if (e.target.tagName !== "INPUT" && 
+        e.target.tagName !== "SELECT" &&
+        e.target.tagName !== "LABEL") {
+        filters.classList.toggle("open");
+    }
+});
+
+// Prevent drawer from closing when interacting with actual filters
+["input", "select"].forEach(tag => {
+    filters.querySelectorAll(tag).forEach(el => {
+        el.addEventListener("click", (e) => e.stopPropagation());
+        el.addEventListener("touchstart", (e) => e.stopPropagation());
+    });
+});
+
         })
         .catch(error => {
             console.error('Error loading business data:', error);
@@ -193,5 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 });
+
 
 
