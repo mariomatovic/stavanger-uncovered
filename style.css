@@ -248,3 +248,10 @@ body {
     background-color: #667eea !important; 
     color: white !important;
 }
+
+
+/* Force pointer cursor on the custom marker's large clickable area to override map drag cursor */
+.custom-marker {
+    cursor: pointer !important;
+}
+
