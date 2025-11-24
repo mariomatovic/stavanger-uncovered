@@ -21,11 +21,11 @@ body {
 #title-card {
     position: absolute;
     top: 20px;
-    left: 20px;
-    background: rgba(255, 255, 255, 0.95);
+    right: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 20px 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     max-width: 350px;
 }
@@ -43,44 +43,6 @@ body {
     line-height: 1.5;
 }
 
-#controls {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 200px;
-}
-
-#controls button {
-    padding: 10px 16px;
-    border: 2px solid #e0e0e0;
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    color: #333;
-}
-
-#controls button:hover {
-    background: #f5f5f5;
-    border-color: #007bff;
-}
-
-#controls button.active {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
 #filters {
     position: absolute;
     bottom: 20px;
@@ -90,13 +52,16 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    max-width: 320px;
+    max-width: 340px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
 }
 
 #filters h3 {
     font-size: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     color: #1a1a1a;
+    font-weight: 600;
 }
 
 .filter-group {
@@ -111,7 +76,8 @@ body {
     color: #333;
 }
 
-.filter-group select {
+.filter-group select,
+.filter-group input[type="text"] {
     width: 100%;
     padding: 8px 12px;
     border: 2px solid #e0e0e0;
@@ -119,18 +85,30 @@ body {
     font-size: 13px;
     cursor: pointer;
     background: white;
+    transition: border-color 0.2s;
 }
 
-.filter-group select:focus {
+.filter-group input[type="text"] {
+    cursor: text;
+}
+
+.filter-group select:focus,
+.filter-group input[type="text"]:focus {
     outline: none;
     border-color: #007bff;
+}
+
+.filter-group input[type="text"]::placeholder {
+    color: #999;
 }
 
 .checkbox-group {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
 }
 
 .checkbox-group input[type="checkbox"] {
@@ -143,20 +121,23 @@ body {
     font-size: 13px;
     cursor: pointer;
     margin: 0;
+    color: #666;
 }
 
 #status {
     font-size: 12px;
     color: #666;
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid #e0e0e0;
+    line-height: 1.5;
 }
 
 .leaflet-popup-content {
     margin: 12px;
     font-size: 13px;
     line-height: 1.6;
+    min-width: 250px;
 }
 
 .leaflet-popup-content b {
@@ -169,8 +150,57 @@ body {
     margin: 8px 0;
 }
 
+.company-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.status-active {
+    color: #28a745;
+}
+
+.status-inactive {
+    color: #dc3545;
+}
+
+/* Scrollbar styling for filter panel */
+#filters::-webkit-scrollbar {
+    width: 6px;
+}
+
+#filters::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#filters::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+#filters::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 @media (max-width: 768px) {
-    #title-card, #controls, #filters {
+    #title-card, #filters {
         max-width: calc(100% - 40px);
+    }
+    
+    #title-card {
+        right: 10px;
+        top: 10px;
+        padding: 15px 20px;
+    }
+    
+    #filters {
+        left: 10px;
+        bottom: 10px;
+        max-height: 50vh;
     }
 }
