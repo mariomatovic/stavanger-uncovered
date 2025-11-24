@@ -225,45 +225,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Get color based on industry
                 const color = industryColors[biz.industry] || '#6c757d';
                 
-                const circle = L.circleMarker([biz.latitude, biz.longitude], {
-                    radius: 5,
-                    fillColor: color,
-                    color: color,
-                    weight: 1,
-                    opacity: 0.7,
-                    fillOpacity: 0.5
-                });
+                // Custom label for business name (clickable)
+const labelText = biz.name; // or: `${biz.name} - ${biz.company_type || ''}`
 
-                // Create the popup content
-                const ageMonths = getCompanyAgeMonths(biz.founded);
-                const ageText = ageMonths < 12 ? 
-                    `${ageMonths} months` : 
-                    `${Math.floor(ageMonths / 12)} years`;
+const customIcon = L.divIcon({
+    className: 'custom-label-icon',
+    html: `
+        <div class="marker-label" style="
+            background: white;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 2px 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            cursor: pointer;
+            transform: translate(-50%, -18px);
+        ">
+            ${labelText}
+        </div>
+    `,
+    iconSize: [0, 0]
+});
 
-                const popupContent = `
-                    <div>
-                        <b style="font-size: 14px;">${biz.name}</b><br>
-                        <span class="company-badge">${biz.company_type || 'Unknown Type'}</span>
-                        <hr style="margin: 8px 0;">
-                        <b>Industry:</b> ${biz.industry || 'Not specified'}<br>
-                        <b>Employees:</b> ${biz.employees || 'Unknown'}<br>
-                        <b>Age:</b> ${ageText}<br>
-                        <b>Status:</b> <span class="status-active">${biz.status || 'Unknown'}</span><br>
-                        <b>Area:</b> ${biz.municipality || 'Unknown'}<br>
-                        <b>Address:</b> ${biz.address}<br>
-                        <small style="color: #999;">Org. Nr: ${biz.org_number}</small>
-                    </div>
-                `;
+// Base pin (circle marker stays)
+const marker = L.circleMarker([biz.latitude, biz.longitude], {
+    radius: 5,
+    fillColor: color,
+    color: color,
+    weight: 1,
+    opacity: 0.7,
+    fillOpacity: 0.5
+});
 
-                circle.bindPopup(popupContent);
-                
-                if (useclustering) {
-                    markers.push(circle);
-                } else {
-                    circle.addTo(businessLayer);
-                }
-                
-                drawnCount++;
+marker.bindPopup(popupContent);
+
+// Label marker (click opens same popup)
+const labelMarker = L.marker([biz.latitude, biz.longitude], { icon: customIcon });
+labelMarker.on('click', () => marker.openPopup());
+
+// Add both to map or cluster
+if (useclustering) {
+    markers.push(marker, labelMarker);
+} else {
+    marker.addTo(businessLayer);
+    labelMarker.addTo(businessLayer);
+}
+
+drawnCount++;
+
             }
         });
         
@@ -285,4 +294,5 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStatus(); // This call is now a no-op
     }
 });
+
 
