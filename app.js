@@ -211,64 +211,99 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-    function drawBusinesses() {
-        // Clear existing layers
-        businessLayer.clearLayers();
-        markerClusterGroup.clearLayers();
-        
-        let drawnCount = 0;
-        const markers = [];
+   function drawBusinesses() {
+    // Clear existing layers
+    businessLayer.clearLayers();
+    markerClusterGroup.clearLayers();
+    
+    let drawnCount = 0;
+    const markers = [];
 
-        businesses.forEach(biz => {
-            // Only draw if we have valid coordinates and passes filters
-            if (biz.latitude && biz.longitude && passesFilters(biz)) {
-                // Get color based on industry
-                const color = industryColors[biz.industry] || '#6c757d';
-                
-                // Label text (you can include company_type if you like)
-const labelText = biz.name;
+    businesses.forEach(biz => {
+        // Only draw if we have valid coordinates and passes filters
+        if (biz.latitude && biz.longitude && passesFilters(biz)) {
 
-// Create the popup first (unchanged)
-const marker = L.circleMarker([biz.latitude, biz.longitude], {
-    radius: 5,
-    fillColor: color,
-    color: color,
-    weight: 1,
-    opacity: 0.7,
-    fillOpacity: 0.5
-});
-marker.bindPopup(popupContent);
+            // Get color based on industry
+            const color = industryColors[biz.industry] || '#6c757d';
 
-// Create label icon
-const customIcon = L.divIcon({
-    className: 'custom-label-icon',
-    html:
-        '<div class="marker-label">' +
-        labelText +
-        '</div>',
-    iconSize: [0, 0]
-});
+            // Build popup content (same as before)
+            const ageMonths = getCompanyAgeMonths(biz.founded);
+            const ageText = ageMonths < 12 ? 
+                `${ageMonths} months` : 
+                `${Math.floor(ageMonths / 12)} years`;
 
-// Create label marker that triggers popup
-const labelMarker = L.marker([biz.latitude, biz.longitude], {
-    icon: customIcon,
-    interactive: true
-});
-labelMarker.on('click', () => marker.openPopup());
+            const popupContent = `
+                <div>
+                    <b style="font-size: 14px;">${biz.name}</b><br>
+                    <span class="company-badge">${biz.company_type || 'Unknown Type'}</span>
+                    <hr style="margin: 8px 0;">
+                    <b>Industry:</b> ${biz.industry || 'Not specified'}<br>
+                    <b>Employees:</b> ${biz.employees || 'Unknown'}<br>
+                    <b>Age:</b> ${ageText}<br>
+                    <b>Status:</b> <span class="status-active">${biz.status || 'Unknown'}</span><br>
+                    <b>Area:</b> ${biz.municipality || 'Unknown'}<br>
+                    <b>Address:</b> ${biz.address}<br>
+                    <small style="color: #999;">Org. Nr: ${biz.org_number}</small>
+                </div>
+            `;
 
-// Add both markers
-if (useclustering) {
-    markers.push(marker);
-    markers.push(labelMarker);
-} else {
-    marker.addTo(businessLayer);
-    labelMarker.addTo(businessLayer);
+            // Label text (visible above pin)
+            const labelText = biz.name;
+
+            // Marker pin (circle)
+            const marker = L.circleMarker([biz.latitude, biz.longitude], {
+                radius: 5,
+                fillColor: color,
+                color: color,
+                weight: 1,
+                opacity: 0.7,
+                fillOpacity: 0.5
+            });
+            marker.bindPopup(popupContent);
+
+            // Label marker (clickable text)
+            const customIcon = L.divIcon({
+                className: 'custom-label-icon',
+                html: '<div class="marker-label">' + labelText + '</div>',
+                iconSize: [0, 0]
+            });
+
+            const labelMarker = L.marker([biz.latitude, biz.longitude], {
+                icon: customIcon,
+                interactive: true
+            });
+
+            labelMarker.on('click', () => marker.openPopup());
+
+            // Add depending on clustering setting
+            if (useclustering) {
+                markers.push(marker);
+                markers.push(labelMarker);
+            } else {
+                marker.addTo(businessLayer);
+                labelMarker.addTo(businessLayer);
+            }
+
+            drawnCount++;
+        }
+    });
+
+    // Add markers to cluster if clustering enabled
+    if (useclustering && markers.length > 0) {
+        markerClusterGroup.addLayers(markers);
+        map.addLayer(markerClusterGroup);
+    } else {
+        map.removeLayer(markerClusterGroup);
+    }
+
+    // Update title card
+    const activeCount = businesses.filter(b => b.status === 'Active').length;
+    document.getElementById('title-card').innerHTML = `
+        <h1>Stavanger Uncovered</h1>
+        <p>Showing <b>${drawnCount.toLocaleString()}</b> active businesses from <b>${activeCount.toLocaleString()}</b> total.</p>
+    `;
 }
 
-drawnCount++;
-
-            }
-        });
         
         // Add markers to cluster group if clustering is enabled
         if (useclustering && markers.length > 0) {
@@ -288,6 +323,7 @@ drawnCount++;
         updateStatus(); // This call is now a no-op
     }
 });
+
 
 
 
