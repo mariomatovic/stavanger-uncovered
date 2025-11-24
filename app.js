@@ -285,3 +285,4 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStatus(); // This call is now a no-op
     }
 });
+
