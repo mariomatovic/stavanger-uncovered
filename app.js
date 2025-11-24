@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize the Map - Centered on Stavanger
-    const map = L.map('map').setView([58.97, 5.73], 12);
+    // 1. Initialize the Map - Centered on Stavanger
+    // Zoom controls are explicitly moved to the top-right corner to be next to the title card
+    const map = L.map('map', {zoomControl: false}).setView([58.97, 5.73], 12);
+    L.control.zoom({position: 'topright'}).addTo(map);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -79,19 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    // 5. Update status display
+    // 5. Update status display (Removed as requested by user)
     function updateStatus() {
-        const total = businesses.length;
-        const active = businesses.filter(b => b.status === 'Active').length;
-        const withCoords = businesses.filter(b => b.latitude && b.longitude && b.status === 'Active').length;
-        const filtered = businesses.filter(b => b.latitude && b.longitude && passesFilters(b)).length;
-        
-        document.getElementById('status').innerHTML = `
-            <b>Total:</b> ${total.toLocaleString()}<br>
-            <b>Active:</b> ${active.toLocaleString()}<br>
-            <b>On map:</b> ${withCoords.toLocaleString()}<br>
-            <b>Filtered:</b> ${filtered.toLocaleString()}
-        `;
+        // Function body is now empty as the status display was removed from the UI
     }
 
     // 6. Populate dynamic filters
@@ -161,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Initial draw
             drawBusinesses();
-            updateStatus();
+            updateStatus(); // This call is now a no-op
 
             // 8. Handle Controls
             const searchInput = document.getElementById('searchInput');
@@ -176,28 +169,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     drawBusinesses();
-                    updateStatus();
+                    // updateStatus() is now a no-op, but kept for structural integrity
+                    updateStatus(); 
                 }, 500);
             });
 
             ageFilter.addEventListener('change', () => {
                 drawBusinesses();
-                updateStatus();
+                // updateStatus() is now a no-op, but kept for structural integrity
+                updateStatus(); 
             });
 
             industryFilter.addEventListener('change', () => {
                 drawBusinesses();
-                updateStatus();
+                // updateStatus() is now a no-op, but kept for structural integrity
+                updateStatus(); 
             });
 
             companyTypeFilter.addEventListener('change', () => {
                 drawBusinesses();
-                updateStatus();
+                // updateStatus() is now a no-op, but kept for structural integrity
+                updateStatus(); 
             });
 
             areaFilter.addEventListener('change', () => {
                 drawBusinesses();
-                updateStatus();
+                // updateStatus() is now a no-op, but kept for structural integrity
+                updateStatus(); 
             });
 
             clusterToggle.addEventListener('change', (e) => {
@@ -284,6 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>Showing <b>${drawnCount.toLocaleString()}</b> active businesses from <b>${activeCount.toLocaleString()}</b> total.</p>
         `;
         
-        updateStatus();
+        updateStatus(); // This call is now a no-op
     }
 });
