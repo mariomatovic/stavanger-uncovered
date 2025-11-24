@@ -211,82 +211,51 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         });
 
-   function drawBusinesses() {
-    // Clear existing layers
-    businessLayer.clearLayers();
-    markerClusterGroup.clearLayers();
-    
-    let drawnCount = 0;
-    const markers = [];
+   function drawBusinesses() { 
+       // Clear existing layers 
+       businessLayer.clearLayers(); 
+       markerClusterGroup.clearLayers(); 
+       
+       let drawnCount = 0; 
+       const markers = [];
+       
+       businesses.forEach(biz => { 
+           // Only draw if we have valid coordinates and passes filters 
+           if (biz.latitude && biz.longitude && passesFilters(biz)) { 
+               // Get color based on industry 
+               const color = industryColors[biz.industry] || '#6c757d'; 
+               const circle = L.circleMarker([biz.latitude, biz.longitude], { 
+                   radius: 5, 
+                   fillColor: color, 
+                   color: color, 
+                   weight: 1, 
+                   opacity: 0.7, 
+                   fillOpacity: 0.5 
+               });
+               // Create the popup content 
+               const ageMonths = getCompanyAgeMonths(biz.founded); 
+               const ageText = ageMonths < 12 ? ${ageMonths} months : ${Math.floor(ageMonths / 12)} years; 
+               const popupContent = <div> <b style="font-size: 14px;">${biz.name}</b><br> 
+                   <span class="company-badge">${biz.company_type || 'Unknown Type'}</span> <hr style="margin: 8px 0;"> 
+                   <b>Industry:</b> ${biz.industry || 'Not specified'}<br> 
+                   <b>Employees:</b> ${biz.employees || 'Unknown'}<br> 
+                   <b>Age:</b> ${ageText}<br> <b>Status:</b> 
+                   <span class="status-active">${biz.status || 'Unknown'}</span><br> <b>Area:</b> ${biz.municipality || 'Unknown'}<br> 
+                   <b>Address:</b> ${biz.address}<br> 
+                   <small style="color: #999;">Org. Nr: ${biz.org_number}</small> 
+                   </div> 
+                   ; 
+               circle.bindPopup(popupContent);
+               if (useclustering) { 
+                   markers.push(circle); 
+               } else { 
+                   circle.addTo(businessLayer); 
+               } 
+               drawnCount++; 
+           } 
+       });
 
-    businesses.forEach(biz => {
-        // Only draw if we have valid coordinates and passes filters
-        if (biz.latitude && biz.longitude && passesFilters(biz)) {
-
-            // Get color based on industry
-            const color = industryColors[biz.industry] || '#6c757d';
-
-            // Build popup content
-            const ageMonths = getCompanyAgeMonths(biz.founded);
-            const ageText = ageMonths < 12 ? 
-                `${ageMonths} months` : 
-                `${Math.floor(ageMonths / 12)} years`;
-
-            const popupContent = `
-                <div>
-                    <b style="font-size: 14px;">${biz.name}</b><br>
-                    <span class="company-badge">${biz.company_type || 'Unknown Type'}</span>
-                    <hr style="margin: 8px 0;">
-                    <b>Industry:</b> ${biz.industry || 'Not specified'}<br>
-                    <b>Employees:</b> ${biz.employees || 'Unknown'}<br>
-                    <b>Age:</b> ${ageText}<br>
-                    <b>Status:</b> <span class="status-active">${biz.status || 'Unknown'}</span><br>
-                    <b>Area:</b> ${biz.municipality || 'Unknown'}<br>
-                    <b>Address:</b> ${biz.address}<br>
-                    <small style="color: #999;">Org. Nr: ${biz.org_number}</small>
-                </div>
-            `;
-
-            // Label text (visible above pin)
-            const labelText = biz.name || '';
-
-            // Marker pin (circle)
-            const marker = L.circleMarker([biz.latitude, biz.longitude], {
-                radius: 5,
-                fillColor: color,
-                color: color,
-                weight: 1,
-                opacity: 0.7,
-                fillOpacity: 0.5
-            });
-
-            // Bind popup to marker
-            marker.bindPopup(popupContent);
-
-            // Bind a permanent tooltip to serve as the label.
-            // Using interactive: true means pointer events pass through to marker; clicking label triggers marker click.
-            marker.bindTooltip(labelText, {
-                permanent: true,
-                direction: 'top',
-                offset: [0, -6],
-                className: 'marker-label-tooltip',
-                interactive: true
-            });
-
-            // Make marker open popup on click (tooltip clicks will bubble to marker)
-            marker.on('click', () => marker.openPopup());
-
-            // Add to cluster array (single layer per business)
-            if (useclustering) {
-                markers.push(marker);
-            } else {
-                marker.addTo(businessLayer);
-            }
-
-            drawnCount++;
-        }
-    });
-
+       
     // Add markers to cluster if clustering enabled
     if (useclustering && markers.length > 0) {
         markerClusterGroup.addLayers(markers);
@@ -340,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStatus(); // This call is now a no-op
     }
 });
+
 
 
 
