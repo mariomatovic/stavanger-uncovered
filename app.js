@@ -38,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Filter functions
     function passesFilters(biz) {
-        // Only show active companies
+        // Only show active companies with valid coordinates
+        if (!biz.latitude || !biz.longitude) return false;
         if (biz.status && biz.status !== 'Active') return false;
 
         // Search filter
