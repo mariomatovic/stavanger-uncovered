@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         maxClusterRadius: 50,
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
-        zoomToBoundsOnClick: true
+        zoomToBoundsOnClick: false
     });
 
     let businesses = [];
@@ -193,3 +193,4 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 });
+
