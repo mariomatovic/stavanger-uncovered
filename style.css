@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
 }
 
@@ -34,12 +34,12 @@ body {
     font-size: 24px;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #1a1a1a;
+    color: #ffffff;
 }
 
 #title-card p {
     font-size: 14px;
-    color: #666;
+    color: rgba(255, 255, 255, 0.9);
     line-height: 1.5;
 }
 
@@ -47,10 +47,10 @@ body {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    background: rgba(255, 255, 255, 0.95);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     max-width: 340px;
     max-height: calc(100vh - 40px);
@@ -60,7 +60,7 @@ body {
 #filters h3 {
     font-size: 16px;
     margin-bottom: 15px;
-    color: #1a1a1a;
+    color: #ffffff;
     font-weight: 600;
 }
 
@@ -73,29 +73,32 @@ body {
     font-size: 13px;
     font-weight: 500;
     margin-bottom: 6px;
-    color: #333;
+    color: #ffffff;
 }
 
 .filter-group select,
 .filter-group input[type="text"] {
     width: 100%;
-    padding: 8px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 13px;
+    padding: 10px 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
     cursor: pointer;
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
     transition: border-color 0.2s;
 }
 
 .filter-group input[type="text"] {
     cursor: text;
+    font-size: 15px;
+    padding: 12px 14px;
 }
 
 .filter-group select:focus,
 .filter-group input[type="text"]:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #ffffff;
+    background: #ffffff;
 }
 
 .filter-group input[type="text"]::placeholder {
@@ -108,7 +111,7 @@ body {
     gap: 8px;
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .checkbox-group input[type="checkbox"] {
@@ -121,15 +124,15 @@ body {
     font-size: 13px;
     cursor: pointer;
     margin: 0;
-    color: #666;
+    color: #ffffff;
 }
 
 #status {
     font-size: 12px;
-    color: #666;
+    color: rgba(255, 255, 255, 0.9);
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
     line-height: 1.5;
 }
 
@@ -203,4 +206,29 @@ body {
         bottom: 10px;
         max-height: 50vh;
     }
+}
+
+/* Make sure Leaflet zoom controls don't overlap */
+.leaflet-top.leaflet-left {
+    top: 20px;
+    left: 20px;
+}
+
+.leaflet-control-zoom {
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    border: 2px solid rgba(102, 126, 234, 0.3) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    color: #667eea !important;
+    font-weight: 600 !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background-color: #667eea !important;
+    color: white !important;
 }
