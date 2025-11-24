@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initialize the Map - Centered on Stavanger
     const map = L.map('map', {zoomControl: false}).setView([58.97, 5.73], 12);
     L.control.zoom({position: 'topright'}).addTo(map);
 
@@ -9,12 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
         maxZoom: 20
     }).addTo(map);
 
-    // 2. Color palette for different industries
     const industryColorPalette = [
         '#007bff', '#28a745', '#dc3545', '#ffc107', '#6f42c1', 
         '#fd7e14', '#20c997', '#e83e8c', '#17a2b8', '#6c757d'
     ];
-    
+
     let industryColors = {};
     let businessLayer = L.layerGroup().addTo(map);
     let markerClusterGroup = L.markerClusterGroup({
@@ -23,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showCoverageOnHover: false,
         zoomToBoundsOnClick: true
     });
-    
+
     let businesses = [];
     let useclustering = true;
     let searchTimeout = null;
@@ -104,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             businesses = data;
-            console.log(`Loaded ${businesses.length} businesses.`);
             populateFilters();
             drawBusinesses();
             updateStatus();
@@ -161,31 +158,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            const marker = L.circleMarker([biz.latitude, biz.longitude], {
-                radius: 5,
-                fillColor: color,
-                color: color,
-                weight: 1,
-                opacity: 0.7,
-                fillOpacity: 0.5
-            }).bindPopup(popupContent);
-
-            const labelMarker = L.marker([biz.latitude, biz.longitude], {
+            // SINGLE marker with label above pin
+            const marker = L.marker([biz.latitude, biz.longitude], {
                 icon: L.divIcon({
                     className: 'custom-label-icon',
-                    html: `<div class="marker-label">${biz.name}</div>`,
-                    iconSize: [0, 0]
+                    html: `
+                        <div style="text-align:center;">
+                            <div class="marker-label" style="margin-bottom:4px;">${biz.name}</div>
+                            <div style="width:10px;height:10px;background:${color};border-radius:50%;margin:0 auto;"></div>
+                        </div>
+                    `,
+                    iconSize: [50, 30],
+                    iconAnchor: [25, 30]
                 }),
                 interactive: true
-            }).on('click', () => marker.openPopup());
+            }).bindPopup(popupContent);
 
-            if (useclustering) {
-                markers.push(marker, labelMarker);
-            } else {
-                marker.addTo(businessLayer);
-                labelMarker.addTo(businessLayer);
-            }
-
+            markers.push(marker);
             drawnCount++;
         });
 
@@ -193,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             markerClusterGroup.addLayers(markers);
             map.addLayer(markerClusterGroup);
         } else {
+            markers.forEach(m => m.addTo(businessLayer));
             map.removeLayer(markerClusterGroup);
         }
 
@@ -203,11 +193,3 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 });
-
-
-
-
-
-
-
-
